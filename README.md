@@ -93,6 +93,7 @@ strings_update_translation
 #### TMS (`tms_*`)
 
 ```text
+tms_create_analyses_async
 tms_create_job_from_file
 tms_create_project
 tms_create_project_from_template
@@ -101,6 +102,7 @@ tms_download_target_file_async
 tms_evaluate_quality_profile
 tms_download_target_file_by_async_request
 tms_export_trans_memory
+tms_get_analysis
 tms_get_async_limits
 tms_get_async_request
 tms_get_job
@@ -109,6 +111,7 @@ tms_get_project_template
 tms_get_termbase
 tms_get_trans_memory
 tms_import_trans_memory
+tms_list_analysis_jobs
 tms_list_jobs
 tms_list_pending_requests
 tms_list_project_templates

@@ -12,8 +12,11 @@ import { registerUploadTermbaseTool } from "#products/tms/tools/upload-termbase.
 import { registerGetTermbaseTool } from "#products/tms/tools/get-termbase.js";
 import { registerGetAsyncLimitsTool } from "#products/tms/tools/get-async-limits.js";
 import { registerGetAsyncRequestTool } from "#products/tms/tools/get-async-request.js";
+import { registerCreateAnalysesAsyncTool } from "#products/tms/tools/create-analyses-async.js";
 import { registerCreateJobFromFileTool } from "#products/tms/tools/create-job-from-file.js";
 import { registerCreateProjectTool } from "#products/tms/tools/create-project.js";
+import { registerGetAnalysisTool } from "#products/tms/tools/get-analysis.js";
+import { registerListAnalysisJobsTool } from "#products/tms/tools/list-analysis-jobs.js";
 import { registerEvaluateQualityProfileTool } from "#products/tms/tools/evaluate-quality-profile.js";
 import { registerDownloadTargetFileAsyncTool } from "#products/tms/tools/download-target-file-async.js";
 import { registerDownloadTargetFileByAsyncRequestTool } from "#products/tms/tools/download-target-file-by-async-request.js";
@@ -62,6 +65,9 @@ export const tmsModule: ProductModule<"tms"> = {
     registerDownloadTargetFileByAsyncRequestTool(server, runtime);
     registerListPendingRequestsTool(server, runtime);
     registerGetAsyncRequestTool(server, runtime);
+    registerCreateAnalysesAsyncTool(server, runtime);
+    registerGetAnalysisTool(server, runtime);
+    registerListAnalysisJobsTool(server, runtime);
     registerListTermbasesTool(server, runtime);
     registerListTransMemoriesTool(server, runtime);
     registerGetTransMemoryTool(server, runtime);

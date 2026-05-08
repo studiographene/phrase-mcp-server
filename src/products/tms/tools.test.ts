@@ -118,6 +118,9 @@ const EXPECTED_TOOL_NAMES = [
   "tms_search_job_termbases",
   "tms_upload_termbase",
   "tms_evaluate_quality_profile",
+  "tms_create_analyses_async",
+  "tms_get_analysis",
+  "tms_list_analysis_jobs",
 ];
 
 describe("tmsModule tools", () => {
@@ -1120,5 +1123,131 @@ describe("tmsModule tools", () => {
       },
     );
     expect(result).toEqual({ ok: true });
+  });
+
+  it("create analyses async posts /v3/analyses with jobs, default type, and named fields", async () => {
+    client.postJson.mockResolvedValueOnce({
+      asyncRequests: [{ id: "async-1", action: "PRE_ANALYSE", asyncResponse: null }],
+    });
+
+    const result = await invokeTool(registrations, "tms_create_analyses_async", {
+      jobs: [{ uid: "job/1" }, { uid: "job/2" }],
+      name: "Quote prep",
+      provider: { uid: "vendor-7", type: "VENDOR" },
+      netRateScheme: { uid: "scheme-1" },
+      analyseLanguageParts: { jobParts: [{ uid: "jp-1" }] },
+    });
+
+    expect(client.postJson).toHaveBeenCalledWith("/v3/analyses", {
+      jobs: [{ uid: "job/1" }, { uid: "job/2" }],
+      type: "PreAnalyse",
+      name: "Quote prep",
+      provider: { uid: "vendor-7", type: "VENDOR" },
+      netRateScheme: { uid: "scheme-1" },
+      analyseLanguageParts: { jobParts: [{ uid: "jp-1" }] },
+    });
+    expect(result).toEqual({
+      asyncRequests: [{ id: "async-1", action: "PRE_ANALYSE", asyncResponse: null }],
+    });
+  });
+
+  it("create analyses async honours explicit type and merges extras passthrough", async () => {
+    client.postJson.mockResolvedValueOnce({ asyncRequests: [] });
+
+    await invokeTool(registrations, "tms_create_analyses_async", {
+      jobs: [{ uid: "job-1" }],
+      type: "Compare",
+      extras: {
+        compareWorkflowLevel: 2,
+        includeTransMemory: true,
+        separateTm: false,
+      },
+    });
+
+    expect(client.postJson).toHaveBeenCalledWith("/v3/analyses", {
+      compareWorkflowLevel: 2,
+      includeTransMemory: true,
+      separateTm: false,
+      jobs: [{ uid: "job-1" }],
+      type: "Compare",
+    });
+  });
+
+  it("create analyses async rethrows server errors", async () => {
+    client.postJson.mockRejectedValueOnce(createHttpError(500, "Internal Server Error", "boom"));
+
+    await expect(
+      invokeTool(registrations, "tms_create_analyses_async", {
+        jobs: [{ uid: "job-1" }],
+      }),
+    ).rejects.toThrow("HTTP 500");
+  });
+
+  it("get analysis fetches /v3/analyses/{uid} with encoded identifier", async () => {
+    client.get.mockResolvedValueOnce({
+      uid: "analysis-1",
+      totals: { weightedNoMatchWords: 42 },
+    });
+
+    const result = await invokeTool(registrations, "tms_get_analysis", {
+      analysis_uid: "analysis/1",
+    });
+
+    expect(client.get).toHaveBeenCalledWith("/v3/analyses/analysis%2F1");
+    expect(result).toEqual({ uid: "analysis-1", totals: { weightedNoMatchWords: 42 } });
+  });
+
+  it("get analysis rethrows 404 errors", async () => {
+    client.get.mockRejectedValueOnce(createHttpError(404, "Not Found", "no such analysis"));
+
+    await expect(
+      invokeTool(registrations, "tms_get_analysis", {
+        analysis_uid: "missing",
+      }),
+    ).rejects.toThrow("HTTP 404");
+  });
+
+  it("list analysis jobs without pagination calls get with query", async () => {
+    client.get.mockResolvedValueOnce({ content: [{ uid: "ajob-1" }] });
+
+    await invokeTool(registrations, "tms_list_analysis_jobs", {
+      analysis_uid: "analysis/1",
+      query: { pageNumber: 0, pageSize: 50 },
+    });
+
+    expect(client.get).toHaveBeenCalledWith("/v2/analyses/analysis%2F1/jobs", {
+      pageNumber: 0,
+      pageSize: 50,
+    });
+  });
+
+  it("list analysis jobs with paginate=true calls paginateGet with controls", async () => {
+    client.paginateGet.mockResolvedValueOnce({
+      items: [{ uid: "ajob-1" }, { uid: "ajob-2" }],
+      pages_fetched: 1,
+      items_returned: 2,
+      truncated: false,
+    });
+
+    const result = await invokeTool(registrations, "tms_list_analysis_jobs", {
+      analysis_uid: "analysis-1",
+      paginate: true,
+      page_size: 25,
+      max_pages: 3,
+      max_items: 60,
+    });
+
+    expect(client.paginateGet).toHaveBeenCalledWith("/v2/analyses/analysis-1/jobs", {
+      query: undefined,
+      pageSize: 25,
+      maxPages: 3,
+      maxItems: 60,
+    });
+    expect(result).toEqual({
+      items: [{ uid: "ajob-1" }, { uid: "ajob-2" }],
+      pages_fetched: 1,
+      items_returned: 2,
+      truncated: false,
+    });
   });
 });
