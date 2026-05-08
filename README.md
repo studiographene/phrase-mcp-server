@@ -98,6 +98,7 @@ tms_create_project
 tms_create_project_from_template
 tms_create_project_from_template_shorthand
 tms_download_target_file_async
+tms_evaluate_quality_profile
 tms_download_target_file_by_async_request
 tms_export_trans_memory
 tms_get_async_limits
@@ -123,6 +124,23 @@ tms_set_project_status
 tms_update_job
 tms_update_project
 tms_upload_termbase
+```
+
+#### Quality Evaluator (`bqe_*`)
+
+```text
+bqe_create_ai_check
+bqe_create_quality_profile
+bqe_delete_ai_check
+bqe_delete_quality_profile
+bqe_evaluate_segments
+bqe_get_ai_check
+bqe_get_analytics
+bqe_get_quality_profile
+bqe_list_ai_checks
+bqe_list_quality_profiles
+bqe_update_ai_check
+bqe_update_quality_profile
 ```
 
 ## Examples
@@ -293,7 +311,7 @@ Set at least one product token in your MCP client config:
 
 ### Product selection
 
-- `PHRASE_ENABLED_PRODUCTS`: comma-separated subset of `strings,tms,connectors`
+- `PHRASE_ENABLED_PRODUCTS`: comma-separated subset of `strings,tms,bqe,connectors`
 - `PHRASE_DISABLED_PRODUCTS`: products removed from the enabled set
 - Default behavior: all products enabled
 

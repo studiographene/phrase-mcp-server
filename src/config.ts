@@ -181,6 +181,8 @@ async function loadProductRuntime(
       return loadTypedProductRuntime(productModule);
     case "tms":
       return loadTypedProductRuntime(productModule);
+    case "bqe":
+      return loadTypedProductRuntime(productModule);
   }
 }
 

@@ -1,9 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { BqeClient } from "#products/bqe/client";
 import type { ConnectorsClient } from "#products/connectors/client";
 import type { StringsClient } from "#products/strings/client";
 import type { TmsClient } from "#products/tms/client";
 
-export const ALL_PRODUCTS = ["strings", "tms", "connectors"] as const;
+export const ALL_PRODUCTS = ["strings", "tms", "bqe", "connectors"] as const;
 export const ALL_REGIONS = ["eu", "us"] as const;
 
 export type ProductKey = (typeof ALL_PRODUCTS)[number];
@@ -17,6 +18,7 @@ export interface ProductClientMap {
   connectors: ConnectorsClient;
   strings: StringsClient;
   tms: TmsClient;
+  bqe: BqeClient;
 }
 
 export type ProductRuntime<K extends ProductKey = ProductKey> = {
