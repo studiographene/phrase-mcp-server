@@ -8,7 +8,7 @@ export function registerGetAnalysisTool(server: McpServer, runtime: ProductRunti
     "tms_get_analysis",
     {
       description:
-        "Fetch a completed TM analysis with totals across all included jobs (per match-rate band: 101%, 100%, 95-99%, 85-94%, 75-84%, 50-74%, no match, repetitions, with weighted word counts). Use after tms_create_analyses_async has been triggered and tms_get_async_request returns status = COMPLETED. To see per-job results separately, use tms_list_analysis_jobs. (GET /api2/v3/analyses/{uid})",
+        "Fetch a completed TM analysis. The response includes overall metadata plus an analyseLanguageParts array, with each language part containing its own jobs[] array — that is where the per-job match-rate breakdown (101%, 100%, 95-99%, 85-94%, 75-84%, 50-74%, no match, repetitions, with weighted word counts) lives, so per-language results (e.g. Hindi vs Tamil) can be inspected without a separate list call. Use after tms_create_analyses_async has been triggered and tms_get_async_request returns status = COMPLETED. (GET /api2/v3/analyses/{uid})",
       annotations: { title: "[TMS] Get Analysis", readOnlyHint: true },
       inputSchema: {
         analysis_uid: z

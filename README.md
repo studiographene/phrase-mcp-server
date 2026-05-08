@@ -111,7 +111,6 @@ tms_get_project_template
 tms_get_termbase
 tms_get_trans_memory
 tms_import_trans_memory
-tms_list_analysis_jobs
 tms_list_jobs
 tms_list_pending_requests
 tms_list_project_templates

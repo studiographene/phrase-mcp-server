@@ -120,7 +120,6 @@ const EXPECTED_TOOL_NAMES = [
   "tms_evaluate_quality_profile",
   "tms_create_analyses_async",
   "tms_get_analysis",
-  "tms_list_analysis_jobs",
 ];
 
 describe("tmsModule tools", () => {
@@ -1125,7 +1124,7 @@ describe("tmsModule tools", () => {
     expect(result).toEqual({ ok: true });
   });
 
-  it("create analyses async posts /v3/analyses with jobs, default type, and named fields", async () => {
+  it("create analyses async posts /v2/analyses with jobs, default type, and named fields", async () => {
     client.postJson.mockResolvedValueOnce({
       asyncRequests: [{ id: "async-1", action: "PRE_ANALYSE", asyncResponse: null }],
     });
@@ -1135,16 +1134,14 @@ describe("tmsModule tools", () => {
       name: "Quote prep",
       provider: { uid: "vendor-7", type: "VENDOR" },
       netRateScheme: { uid: "scheme-1" },
-      analyseLanguageParts: { jobParts: [{ uid: "jp-1" }] },
     });
 
-    expect(client.postJson).toHaveBeenCalledWith("/v3/analyses", {
+    expect(client.postJson).toHaveBeenCalledWith("/v2/analyses", {
       jobs: [{ uid: "job/1" }, { uid: "job/2" }],
       type: "PreAnalyse",
       name: "Quote prep",
       provider: { uid: "vendor-7", type: "VENDOR" },
       netRateScheme: { uid: "scheme-1" },
-      analyseLanguageParts: { jobParts: [{ uid: "jp-1" }] },
     });
     expect(result).toEqual({
       asyncRequests: [{ id: "async-1", action: "PRE_ANALYSE", asyncResponse: null }],
@@ -1164,7 +1161,7 @@ describe("tmsModule tools", () => {
       },
     });
 
-    expect(client.postJson).toHaveBeenCalledWith("/v3/analyses", {
+    expect(client.postJson).toHaveBeenCalledWith("/v2/analyses", {
       compareWorkflowLevel: 2,
       includeTransMemory: true,
       separateTm: false,
@@ -1205,49 +1202,5 @@ describe("tmsModule tools", () => {
         analysis_uid: "missing",
       }),
     ).rejects.toThrow("HTTP 404");
-  });
-
-  it("list analysis jobs without pagination calls get with query", async () => {
-    client.get.mockResolvedValueOnce({ content: [{ uid: "ajob-1" }] });
-
-    await invokeTool(registrations, "tms_list_analysis_jobs", {
-      analysis_uid: "analysis/1",
-      query: { pageNumber: 0, pageSize: 50 },
-    });
-
-    expect(client.get).toHaveBeenCalledWith("/v2/analyses/analysis%2F1/jobs", {
-      pageNumber: 0,
-      pageSize: 50,
-    });
-  });
-
-  it("list analysis jobs with paginate=true calls paginateGet with controls", async () => {
-    client.paginateGet.mockResolvedValueOnce({
-      items: [{ uid: "ajob-1" }, { uid: "ajob-2" }],
-      pages_fetched: 1,
-      items_returned: 2,
-      truncated: false,
-    });
-
-    const result = await invokeTool(registrations, "tms_list_analysis_jobs", {
-      analysis_uid: "analysis-1",
-      paginate: true,
-      page_size: 25,
-      max_pages: 3,
-      max_items: 60,
-    });
-
-    expect(client.paginateGet).toHaveBeenCalledWith("/v2/analyses/analysis-1/jobs", {
-      query: undefined,
-      pageSize: 25,
-      maxPages: 3,
-      maxItems: 60,
-    });
-    expect(result).toEqual({
-      items: [{ uid: "ajob-1" }, { uid: "ajob-2" }],
-      pages_fetched: 1,
-      items_returned: 2,
-      truncated: false,
-    });
   });
 });
