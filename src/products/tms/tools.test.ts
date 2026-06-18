@@ -108,6 +108,7 @@ const EXPECTED_TOOL_NAMES = [
   "tms_create_job_from_file",
   "tms_download_target_file_async",
   "tms_download_target_file_by_async_request",
+  "tms_download_original_file",
   "tms_list_pending_requests",
   "tms_get_async_request",
   "tms_get_async_limits",
@@ -907,6 +908,47 @@ describe("tmsModule tools", () => {
         async_request_id: "req-1",
       }),
     ).rejects.toThrow("HTTP 500");
+  });
+
+  it("download original file decodes filename and saves output", async () => {
+    client.getBinary.mockResolvedValueOnce({
+      contentType: "text/markdown",
+      contentDisposition: "attachment; filename*=UTF-8''source%20doc.md",
+      bytesBase64: Buffer.from("# demo").toString("base64"),
+      sizeBytes: 6,
+    } satisfies BinaryResponse);
+
+    const outputPath = join(tempDir, "outputs", "source-doc.md");
+    const result = await invokeTool(registrations, "tms_download_original_file", {
+      project_uid: "proj/1",
+      job_uid: "job/2",
+      output_path: outputPath,
+    });
+
+    expect(client.getBinary).toHaveBeenCalledWith("/v1/projects/proj%2F1/jobs/job%2F2/original");
+    expect(result.file_name).toBe("source doc.md");
+    expect(result.saved_to).toBe(resolve(outputPath));
+    const savedContent = await readFile(resolve(outputPath), "utf8");
+    expect(savedContent).toBe("# demo");
+  });
+
+  it("download original file returns base64 without saving when output_path omitted", async () => {
+    client.getBinary.mockResolvedValueOnce({
+      contentType: "application/octet-stream",
+      contentDisposition: null,
+      bytesBase64: Buffer.from("abc").toString("base64"),
+      sizeBytes: 3,
+    } satisfies BinaryResponse);
+
+    const result = await invokeTool(registrations, "tms_download_original_file", {
+      project_uid: "proj-1",
+      job_uid: "job-1",
+    });
+
+    expect(client.getBinary).toHaveBeenCalledWith("/v1/projects/proj-1/jobs/job-1/original");
+    expect(result.file_name).toBeNull();
+    expect(result.bytes_base64).toBe(Buffer.from("abc").toString("base64"));
+    expect(result.saved_to).toBeNull();
   });
 
   it("upload termbase sends file with content-disposition header", async () => {
