@@ -109,6 +109,7 @@ tms_create_project_from_template_shorthand
 tms_download_target_file_async
 tms_evaluate_quality_profile
 tms_download_target_file_by_async_request
+tms_download_original_file
 tms_export_trans_memory
 tms_get_async_limits
 tms_get_async_request

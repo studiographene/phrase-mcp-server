@@ -17,6 +17,7 @@ import { registerCreateProjectTool } from "#products/tms/tools/create-project.js
 import { registerEvaluateQualityProfileTool } from "#products/tms/tools/evaluate-quality-profile.js";
 import { registerDownloadTargetFileAsyncTool } from "#products/tms/tools/download-target-file-async.js";
 import { registerDownloadTargetFileByAsyncRequestTool } from "#products/tms/tools/download-target-file-by-async-request.js";
+import { registerDownloadOriginalFileTool } from "#products/tms/tools/download-original-file.js";
 import { registerCreateProjectFromTemplateShorthandTool } from "#products/tms/tools/create-project-from-template-shorthand.js";
 import { registerCreateProjectFromTemplateTool } from "#products/tms/tools/create-project-from-template.js";
 import { registerGetJobTool } from "#products/tms/tools/get-job.js";
@@ -75,6 +76,7 @@ export const tmsModule: ProductModule<"tms"> = {
     registerCreateJobFromFileTool(server, runtime);
     registerDownloadTargetFileAsyncTool(server, runtime);
     registerDownloadTargetFileByAsyncRequestTool(server, runtime);
+    registerDownloadOriginalFileTool(server, runtime);
     registerListPendingRequestsTool(server, runtime);
     registerGetAsyncRequestTool(server, runtime);
     registerListTermbasesTool(server, runtime);
