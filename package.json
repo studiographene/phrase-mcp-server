@@ -23,6 +23,7 @@
     "clean": "rm -rf dist",
     "build": "tsup",
     "prepack": "npm run build",
+    "prepare": "npm run build",
     "start": "node dist/index.js",
     "lint": "biome lint .",
     "lint:fix": "biome lint . --write",
